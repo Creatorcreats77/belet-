@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+
+.simple-keyboard {
+  background: transparent;
+  border-radius: 10px;
+  padding-top: 10px;
+}
+
+.simple-keyboard .hg-button {
+  height: 100%;
+  background: #333;
+  color: white;
+  border-radius: 8px;
+  margin: 4px;
+  font-size: 32px;
+
+}
+
+.simple-keyboard .hg-button:active {
+  background: #555;
+
+}
