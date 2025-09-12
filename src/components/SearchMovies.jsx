@@ -20,34 +20,25 @@ const SearchMovies = ({ id, title = "Movies", movies = [] }) => {
     $activeIndexSearch,
     $movieIdSearch,
   ]);
-    const navigate = useNavigate(); // React Router
-  
+  const navigate = useNavigate(); // React Router
 
-  // Filter only movies with a valid poster
   const filteredMovies = movies.filter((movie) => movie.poster_path);
 
   const activeIndex = activeIndexSearch[id] ?? 0;
   const activeMovie = filteredMovies[activeIndex];
 
+  // Navigate to movie Detail
+  useEffect(() => {
+    if (navigateToMovieDetail && activeMovie && id === "movies-slider") {
+      navigate(`/movie/${activeMovie.id}`, {
+        state: { movie: activeMovie },
+      });
+      setNavigateToMovieDetail(false);
+    }
+  }, [navigateToMovieDetail, setNavigateToMovieDetail]);
 
-// Navigate to movie Detail
-    useEffect(() => {
-  
-      if (navigateToMovieDetail && activeMovie && id === "movies-slider") {
-        navigate(`/movie/${activeMovie.id}`, {
-          state: { movie: activeMovie },
-        });
-        setNavigateToMovieDetail(false);
-      }
-    }, [navigateToMovieDetail, setNavigateToMovieDetail]);
-
-  /**
-   * Sync the active movie only when a movie has been activated
-   */
   useEffect(() => {
     if (!filteredMovies[activeIndex]) return;
-
-    // ✅ Only sync if there is already a selected movie
     if (
       movieIdSearch.index !== -1 &&
       (movieIdSearch.id !== id || movieIdSearch.index !== activeIndex)
@@ -56,8 +47,6 @@ const SearchMovies = ({ id, title = "Movies", movies = [] }) => {
     }
   }, [activeIndex, filteredMovies, id, movieIdSearch]);
 
-
-  /* -------------------- No Results Handling -------------------- */
   if (filteredMovies.length === 0) {
     return (
       <div className="w-full text-center text-gray-400 py-12">
@@ -67,7 +56,16 @@ const SearchMovies = ({ id, title = "Movies", movies = [] }) => {
     );
   }
 
-  /* -------------------- Movies Slider -------------------- */
+let slideWidth;
+if (filteredMovies.length < 2) {
+  slideWidth = 100;
+} else if (filteredMovies.length < 3) {
+  slideWidth = 46;
+} else if (filteredMovies.length < 4) {
+  slideWidth = 36;
+} else {
+  slideWidth = 100 / visibleSlides;
+}
   return (
     <div id={id} className="relative">
       <h2 className="text-3xl font-bold mb-3 text-white mt-2 ps-24">{title}</h2>
@@ -87,13 +85,13 @@ const SearchMovies = ({ id, title = "Movies", movies = [] }) => {
               const isActive =
                 index === activeIndex &&
                 id === movieIdSearch.id &&
-                movieIdSearch.index !== -1; // 👈 Only highlight when index isn't -1
+                movieIdSearch.index !== -1;
 
               return (
                 <div
                   key={`${movie.id}-${index}`}
                   className="py-2 flex justify-center"
-                  style={{ flex: `0 0 ${100 / visibleSlides}%` }}
+                  style={{ flex: `0 0 ${slideWidth}%` }} // 👈 use dynamic width
                 >
                   <div
                     className={`overflow-hidden rounded-2xl shadow-lg transition-all duration-300 cursor-pointer ${
@@ -119,5 +117,4 @@ const SearchMovies = ({ id, title = "Movies", movies = [] }) => {
     </div>
   );
 };
-
 export default SearchMovies;
