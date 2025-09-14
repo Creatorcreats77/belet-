@@ -14,11 +14,8 @@ import { setActiveCurrentIndex } from "../model/movieContainer";
 
 const visibleSlides = 5;
 
-const Movies = ({ id, title = "Movies", movies = [] }) => {
-    const {
-  navigateToMovieDetail,
-  setNavigateToMovieDetail
-    } = useKeyboard();
+const Movies = ({ id, title = "Movies", movies = [], registerCarouselRef }) => {
+  const { navigateToMovieDetail, setNavigateToMovieDetail } = useKeyboard();
   const navigate = useNavigate(); // React Router
 
   const [current, activeIndex, movieOpen, movieId] = useUnit([
@@ -27,7 +24,6 @@ const Movies = ({ id, title = "Movies", movies = [] }) => {
     $movieOpen,
     $movieId,
   ]);
-
 
   const [setActiveCurrent] = useUnit([setActiveCurrentIndex]);
 
@@ -41,7 +37,6 @@ const Movies = ({ id, title = "Movies", movies = [] }) => {
   useEffect(() => {
     setActiveCurrent(activeIndexForThisCarousel);
   }, [movieId]);
-
 
   useEffect(() => {
     const activeMovie = filteredMovies[activeIndexForThisCarousel];
@@ -64,6 +59,7 @@ const Movies = ({ id, title = "Movies", movies = [] }) => {
       <div className="relative w-full mx-auto overflow-hidden px-12">
         <div className="relative flex items-center">
           <motion.div
+            ref={(el) => registerCarouselRef && registerCarouselRef(id, el)} // <- fixed
             className="flex transition-transform duration-500 ease-in-out"
             style={{
               width: `${(filteredMovies.length * 100) / visibleSlides}%`,
@@ -75,6 +71,7 @@ const Movies = ({ id, title = "Movies", movies = [] }) => {
             {filteredMovies.map((movie, index) => (
               <div
                 key={`${movie.id}-${index}`}
+                data-index={index} // used by parent for position tracking
                 className="py-2 flex justify-center"
                 style={{ flex: `0 0 ${100 / visibleSlides}%` }}
               >

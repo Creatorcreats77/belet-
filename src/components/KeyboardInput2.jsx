@@ -43,6 +43,9 @@ export default function KeyboardInput2({ onInputChange }) {
 
   const [pendingAction, setPendingAction] = useState(null); // ✅ NEW: schedule state updates safely
 
+  const [hasInteracted, setHasInteracted] = useState(false); // 🚀 NEW
+
+
   keyRefs.current = flatKeys.map(
     (_, i) => keyRefs.current[i] ?? React.createRef()
   );
@@ -95,7 +98,6 @@ export default function KeyboardInput2({ onInputChange }) {
 
     if (direction === "down") {
       if (newRow === 3) {
-        // ❌ previously caused direct state update error
         setPendingAction({ type: "GO_SEARCH_CATEGORY" });
         newRow = row + 1;
       } else if (newRow < 3) {
@@ -204,6 +206,11 @@ useEffect(() => {
   function handler(e) {
     const keyCode = e.keyCode || e.which;
 
+    // ✅ Once the user presses any navigation or key, we mark as interacted
+    if (!hasInteracted) {
+      setHasInteracted(true);
+    }
+
     // ---- LEFT ----
     if (e.key === "ArrowLeft" || TvKeyCode.LEFT.includes(keyCode)) {
       e.preventDefault();
@@ -258,7 +265,8 @@ useEffect(() => {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }
-}, [focusedRegion, isOpen, focusedIndex, layout, isShift]);
+}, [focusedRegion, isOpen, focusedIndex, layout, isShift, hasInteracted]);
+
 
 
   /* ----------------- Auto focus current key ----------------- */
@@ -268,37 +276,39 @@ useEffect(() => {
   }, [focusedIndex]);
 
   /* ----------------- Render key button ----------------- */
-  function KeyButton({ keyLabel, index }) {
-    const displayLabel =
-      keyLabel === "Space"
-        ? "___"
-        : isShift && /^[a-zа-яё]$/i.test(keyLabel)
-        ? keyLabel.toUpperCase()
-        : keyLabel;
+function KeyButton({ keyLabel, index }) {
+  const displayLabel =
+    keyLabel === "Space"
+      ? "___"
+      : isShift && /^[a-zа-яё]$/i.test(keyLabel)
+      ? keyLabel.toUpperCase()
+      : keyLabel;
 
-    return (
-      <button
-        ref={keyRefs.current[index]}
-        tabIndex={-1}
-        onClick={() => {
-          setFocusedIndex(index);
-          pressKey(keyLabel);
-        }}
-        onFocus={() => setFocusedIndex(index)}
-        className={
-          "rounded-lg p-3 w-[84%] text-center select-none focus:outline-none transition-shadow " +
-          (keyLabel === "Space" ? "w-[6000px] " : "") +
-          (keyLabel === "Enter" ? "w-[1800px] " : "") +
-          (index === focusedIndex
-            ? "ring-4 bg-gray-600 ring-offset-1 ring-blue-600 shadow-lg"
-            : "bg-gray-700 hover:shadow")
-        }
-        aria-label={`Key ${keyLabel}`}
-      >
-        {displayLabel}
-      </button>
-    );
-  }
+  return (
+    <button
+      ref={keyRefs.current[index]}
+      tabIndex={-1}
+      onClick={() => {
+        setFocusedIndex(index);
+        setHasInteracted(true); // ✅ Clicking also counts as interaction
+        pressKey(keyLabel);
+      }}
+      onFocus={() => setFocusedIndex(index)}
+      className={
+        "rounded-lg p-3 w-[84%] text-center select-none focus:outline-none transition-shadow " +
+        (keyLabel === "Space" ? "w-[6000px] " : "") +
+        (keyLabel === "Enter" ? "w-[1800px] " : "") +
+        (hasInteracted && index === focusedIndex // ✅ Show highlight only after first interaction
+          ? "ring-4 bg-gray-600 ring-offset-1 ring-blue-600 shadow-lg"
+          : "bg-gray-700 hover:shadow")
+      }
+      aria-label={`Key ${keyLabel}`}
+    >
+      {displayLabel}
+    </button>
+  );
+}
+
 
   /* ----------------- Render ----------------- */
   return (

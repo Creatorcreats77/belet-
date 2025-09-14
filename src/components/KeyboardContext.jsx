@@ -35,9 +35,7 @@ import {
   resetFilter,
   setFilterSelection,
 } from "../model/filterSidebarStore";
-import {
-  resetSearchMovies,
-} from "../model/searchMoviesStore";
+import { resetSearchMovies } from "../model/searchMoviesStore";
 import { $categories } from "../model/categories";
 import { filterOptions, filters } from "../model/filterOptions";
 import { setCurrentIndex } from "../model/movieContainer";
@@ -248,9 +246,10 @@ export const KeyboardProvider = ({ children }) => {
           } else if (goBack === "search") {
             setIsOpen(false);
             setMoviePageSidebar(false);
-            setFocusedRegion("search");
+            setFocusedRegion("searchMovies");
             setSearchPageSidebar(true);
-            navigate("/search");
+            setGoBack('home');
+            navigate(-1);
           }
         }
         break;
@@ -265,6 +264,7 @@ export const KeyboardProvider = ({ children }) => {
         } else if (TvKeyCode.ENTER.includes(e.keyCode)) {
           // navigate("/homeDetail");
         } else if (TvKeyCode.BACK.includes(e.keyCode)) {
+          console.log(",,,,,,,,,", goBack)
           if (goBack === "home") {
             console.log("Go back home");
             setFocusedRegion("home");
@@ -295,7 +295,7 @@ export const KeyboardProvider = ({ children }) => {
         } else if (TvKeyCode.ENTER.includes(e.keyCode)) {
           setNavigateToMovieDetail(true);
           setFocusedRegion("moviePage");
-          setGoBack('search');
+          setGoBack("search");
           // navigate("/homeDetail");
         } else if (TvKeyCode.BACK.includes(e.keyCode)) {
           if (goBack === "home") {
@@ -323,10 +323,9 @@ export const KeyboardProvider = ({ children }) => {
         } else if (TvKeyCode.ENTER.includes(e.keyCode)) {
           const { items, activeIndex } = $filterSidebar.getState();
           const item = items[activeIndex];
- resetSearchMovies();
+          resetSearchMovies();
           setFilterSelection({ filter: activeFilterRef.current, item });
           setMovieIdSearch({ id: "movies-slider", index: 0 });
-         
 
           // resetFilter();
           setSearchCategoryPageSidebar(false);

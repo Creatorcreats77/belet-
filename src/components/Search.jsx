@@ -15,6 +15,12 @@ import {
   setFilterSelection,
 } from "../model/filterSidebarStore";
 
+import {
+  $latestMovies,
+  setLatestMovies,
+  addLatestMovies,
+} from "../model/latestMoviesStore";
+
 import { filterOptions, filters } from "../model/filterOptions";
 
 const API_KEY = "8ef128e645b6cc47fe1ff2b61dd975ef";
@@ -28,48 +34,39 @@ export default function Search() {
 
   const [searchText, setSearchText] = useState("");
   const [movies, setMovies] = useState([]);
-  const [latestMovies, setLatestMovies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
-  // Effector state
+  const latestMovies = useUnit($latestMovies); // Effector store for latest movies
   const filterSidebar = useUnit($filterSidebar);
   const activeFilter = useUnit($activeFilter);
 
   const prevSearchText = useRef("");
 
-  const [pageNumber, setPageNumber] = useState(1);
-  const [hasMore, setHasMore] = useState(true); // are there more pages?
-
   const getPaginate = (paginate) => {
-    const pagin = paginate + 1;
-    console.log(pagin);
-    setPageNumber(pagin);
+    setPageNumber(paginate + 1);
   };
 
-  /* -------------------- Fetch Popular Movies on Mount -------------------- */
+  /* -------------------- Fetch Latest Movies -------------------- */
   const fetchLatestMovies = async (pageNum = 1) => {
-    console.log("_____", pageNum);
     try {
       setLoading(true);
       setError(null);
+
       const response = await fetch(
         `${LATEST_URL}?api_key=${API_KEY}&language=en-US&page=${pageNum}`
       );
       const data = await response.json();
 
-      setLatestMovies((prevMovies) =>
-        pageNum === 1 ? data.results : [...prevMovies, ...data.results]
-      );
-      setMovies((prevMovies) =>
-        pageNum === 1 ? data.results : [...prevMovies, ...data.results]
-      );
+      if (pageNum === 1) {
+        setLatestMovies(data.results); // Replace movies
+      } else {
+        addLatestMovies(data.results); // Append movies
+      }
 
-      // ✅ Update hasMore based on total pages
       setHasMore(data.page < data.total_pages);
-
-      // setMovies(data.results || []);
-      // setLatestMovies(data.results || []);
     } catch (err) {
       setError("Failed to fetch latest movies. Please try again.");
     } finally {
@@ -77,26 +74,27 @@ export default function Search() {
     }
   };
 
-  /* -------------------- Fetch Movies When Search Text Changes -------------------- */
+  /* -------------------- Fetch Search Movies -------------------- */
   const fetchMovies = async (pageNum = 1) => {
     if (!searchText.trim()) {
       setMovies(latestMovies);
       return;
-    } // no search, leave movies as-is
+    }
     try {
       setLoading(true);
       setError(null);
+
       const response = await fetch(
         `${SEARCH_URL}?api_key=${API_KEY}&query=${encodeURIComponent(
           searchText
         )}&language=en-US&page=${pageNum}&include_adult=false`
       );
       const data = await response.json();
+
       setMovies((prevMovies) =>
         pageNum === 1 ? data.results : [...prevMovies, ...data.results]
       );
 
-      // ✅ Update hasMore based on total pages
       setHasMore(data.page < data.total_pages);
     } catch (err) {
       setError("Failed to fetch movies. Please try again.");
@@ -105,62 +103,38 @@ export default function Search() {
     }
   };
 
+  /* -------------------- Initialize Latest Movies -------------------- */
   useEffect(() => {
-    console.log("pageNum");
+    // Fetch only when no data available
+    if (latestMovies.length === 0) {
+      fetchLatestMovies(1);
+    }
+  }, []);
+
+  /* -------------------- Sync Movies with Latest Movies -------------------- */
+  useEffect(() => {
     if (!searchText) {
-      fetchLatestMovies(pageNumber);
+      setMovies(latestMovies);
+    }
+  }, [latestMovies, searchText]);
+
+  /* -------------------- Load More Movies -------------------- */
+  useEffect(() => {
+    if (!searchText) {
+      const expectedMovies = pageNumber * 20;
+
+      if (latestMovies.length < expectedMovies) {
+        fetchLatestMovies(pageNumber);
+      }
     } else {
       fetchMovies(pageNumber);
     }
   }, [pageNumber, searchText]);
 
+  /* -------------------- Reset Pagination on Search Change -------------------- */
   useEffect(() => {
-      setPageNumber(1);
-      setMovies(latestMovies);
-  },[searchText])
-
-  /* -------------------- Fetch Movies by Filter -------------------- */
-  useEffect(() => {
-    if (!filterSidebar.selected) return;
-
-    const fetchByFilter = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        let url_d = `${DISCOVER_URL}?api_key=${API_KEY}&language=en-US&page=1&include_adult=false`;
-        let url_s = `${SEARCH_URL}?api_key=${API_KEY}&language=en-US&page=1&include_adult=false`;
-        let url;
-        const { filter, item } = filterSidebar.selected;
-
-        if (filter === "Genres") {
-          url = `${url_d}&with_genres=${item.id}`;
-        } else if (filter === "Year") {
-          url = `${url_d}&primary_release_year=${item}`;
-        } else if (filter === "Categories") {
-          url = `${url_d}&query=${item}`;
-        } else if (filter === "Countries") {
-          url = `${url_d}&with_origin_country=${item.code}`;
-        } else if (filter === "Subtitles") {
-          url = `${url_d}&with_original_language=${item.code}`;
-        } else {
-          url = `${url_s}&query=${encodeURIComponent(item)}`; // Sort, Tags, etc.
-        }
-
-        const response = await fetch(url);
-        const data = await response.json();
-        setMovies(data.results || []);
-      } catch (err) {
-        setError("Failed to fetch movies for this filter.");
-      } finally {
-        setLoading(false);
-        resetFilter(); // close sidebar after fetch
-        setActiveFilter(null);
-      }
-    };
-
-    fetchByFilter();
-  }, [filterSidebar.selected]);
+    setPageNumber(1);
+  }, [searchText]);
 
   /* -------------------- Filter Only Movies With Poster -------------------- */
   const filteredMovies = movies.filter((movie) => movie.poster_path);
@@ -205,7 +179,7 @@ export default function Search() {
               }`}
               onClick={() => {
                 setActiveFilter(filter);
-                setFilterItems(filterOptions[filter]); // load sidebar items
+                setFilterItems(filterOptions[filter]);
               }}
             >
               {filter}
@@ -215,7 +189,6 @@ export default function Search() {
 
         {/* Movie Results */}
         <div className="flex-1 overflow-y-auto mt-4">
-          {/* {loading && !filteredMovies.length <=0 && <p className="text-center text-gray-400">Loading...</p>} */}
           {error && <p className="text-center text-red-500">{error}</p>}
           {!loading && filteredMovies.length === 0 && (
             <p className="text-center text-gray-400">No results found.</p>
@@ -251,38 +224,6 @@ export default function Search() {
           />
         )}
       </div>
-
-      {/* Right Filter Sidebar */}
-      {activeFilter && (
-        <div className="absolute right-0 top-0 h-screen w-[24%] bg-gray-700 text-white p-4 overflow-hidden z-50">
-          <h3 className="text-4xl font-bold mb-4 p-4">{activeFilter}</h3>
-          <div className="flex flex-col gap-2">
-            {filterOptions[activeFilter]
-              ?.slice(
-                filterSidebar.scrollOffset,
-                filterSidebar.scrollOffset + filterSidebar.visibleCount
-              )
-              .map((item, index) => {
-                const globalIndex = filterSidebar.scrollOffset + index;
-                const isActive = globalIndex === filterSidebar.activeIndex;
-
-                return (
-                  <button
-                    key={item.id ?? item.name ?? index}
-                    className={`py-6 px-4 rounded-lg text-3xl text-left transition-colors duration-200 ${
-                      isActive ? "bg-gray-200 text-black" : "text-gray-200"
-                    }`}
-                    onClick={() => {
-                      setFilterSelection({ filter: activeFilter, item });
-                    }}
-                  >
-                    {item.name ?? item}
-                  </button>
-                );
-              })}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
