@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useKeyboard } from "../components/KeyboardContext";
 import BottomSwiper from "./BottomSwiper";
 import SideBar from "./SideBar";
@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom"; // React Router
 
 export default function HomePage({ mainMovie }) {
   const {
-    focusedRegion,
     isOpen,
     setIsOpen,
     movieOpen,
@@ -16,7 +15,7 @@ export default function HomePage({ mainMovie }) {
     sidebarIndex,
     setMenuLength,
     navigateToMovieDetailHome,
-     setNavigateToMovieDetailHome
+    setNavigateToMovieDetailHome,
   } = useKeyboard();
 
   const navigate = useNavigate(); // React Router

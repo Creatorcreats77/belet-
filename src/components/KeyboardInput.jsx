@@ -41,9 +41,9 @@ export default function KeyboardInput({ onInputChange }) {
   const keyRefs = useRef([]);
   const inputRef = useRef(null);
 
-  const [pendingAction, setPendingAction] = useState(null); // ✅ NEW: schedule state updates safely
+  const [pendingAction, setPendingAction] = useState(null); 
 
-  const [hasInteracted, setHasInteracted] = useState(false); // 🚀 NEW
+  const [hasInteracted, setHasInteracted] = useState(false); 
 
 
   keyRefs.current = flatKeys.map(
@@ -80,7 +80,6 @@ export default function KeyboardInput({ onInputChange }) {
 
     if (direction === "left") {
       if (col === 0) {
-        // ❌ previously caused direct state update error
         setPendingAction({ type: "GO_SIDEBAR" });
       } else if (col > 0) {
         newCol = col - 1;
@@ -206,7 +205,6 @@ useEffect(() => {
   function handler(e) {
     const keyCode = e.keyCode || e.which;
 
-    // ✅ Once the user presses any navigation or key, we mark as interacted
     if (!hasInteracted) {
       setHasInteracted(true);
     }
@@ -290,7 +288,7 @@ function KeyButton({ keyLabel, index }) {
       tabIndex={-1}
       onClick={() => {
         setFocusedIndex(index);
-        setHasInteracted(true); // ✅ Clicking also counts as interaction
+        setHasInteracted(true); 
         pressKey(keyLabel);
       }}
       onFocus={() => setFocusedIndex(index)}
@@ -298,7 +296,7 @@ function KeyButton({ keyLabel, index }) {
         "rounded-lg p-3 w-[84%] text-center select-none focus:outline-none transition-shadow " +
         (keyLabel === "Space" ? "w-[6000px] " : "") +
         (keyLabel === "Enter" ? "w-[1800px] " : "") +
-        (hasInteracted && index === focusedIndex // ✅ Show highlight only after first interaction
+        (hasInteracted && index === focusedIndex 
           ? "ring-4 bg-gray-600 ring-offset-1 ring-blue-600 shadow-lg"
           : "bg-gray-700 hover:shadow")
       }

@@ -4,7 +4,7 @@ import SearchMovies from "./SearchMovies";
 import { Mic, ChevronLeft } from "lucide-react";
 import KeyboardInput from "./KeyboardInput";
 import SideBar from "./SideBar";
-import { setMoviesLength, resetSearchMovies } from "../model/searchMoviesStore";
+import { setMoviesLength, resetSearchMovies } from "../model/searchMoviesStoreNextPrev";
 import { useUnit } from "effector-react";
 import {
   $filterSidebar,
@@ -21,7 +21,7 @@ import {
   addLatestMovies,
 } from "../model/latestMoviesStore";
 
-import { filterOptions, filters } from "../model/filterOptions";
+import { filterOptions, filters } from "../model/data/filterCategories";
 
 const API_KEY = "8ef128e645b6cc47fe1ff2b61dd975ef";
 const SEARCH_URL = "https://api.themoviedb.org/3/search/movie";
@@ -39,7 +39,7 @@ export default function Search() {
   const [pageNumber, setPageNumber] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  const latestMovies = useUnit($latestMovies); // Effector store for latest movies
+  const latestMovies = useUnit($latestMovies);
   const filterSidebar = useUnit($filterSidebar);
   const activeFilter = useUnit($activeFilter);
 
@@ -103,7 +103,7 @@ export default function Search() {
     }
   };
 
-    useEffect(() => {
+  useEffect(() => {
     if (!filterSidebar.selected) return;
 
     const fetchByFilter = async () => {
@@ -144,9 +144,6 @@ export default function Search() {
 
     fetchByFilter();
   }, [filterSidebar.selected]);
-
-
-  
 
   /* -------------------- Initialize Latest Movies -------------------- */
   useEffect(() => {

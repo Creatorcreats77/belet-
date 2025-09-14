@@ -1,22 +1,22 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useUnit } from "effector-react";
-import { useNavigate } from "react-router-dom"; // React Router
+import { useNavigate } from "react-router-dom"; 
 import { useKeyboard } from "../components/KeyboardContext";
 import {
   $current,
   $activeIndex,
   nextSlide,
   prevSlide,
-} from "../model/sliderStore";
-import { $movieOpen, $movieId } from "../model/movie";
+} from "../model/sliderNextPrev";
+import { $movieOpen, $movieId } from "../model/movieUpDown";
 import { setActiveCurrentIndex } from "../model/movieContainer";
 
 const visibleSlides = 5;
 
 const Movies = ({ id, title = "Movies", movies = [], registerCarouselRef }) => {
   const { navigateToMovieDetail, setNavigateToMovieDetail } = useKeyboard();
-  const navigate = useNavigate(); // React Router
+  const navigate = useNavigate(); 
 
   const [current, activeIndex, movieOpen, movieId] = useUnit([
     $current,
@@ -59,7 +59,7 @@ const Movies = ({ id, title = "Movies", movies = [], registerCarouselRef }) => {
       <div className="relative w-full mx-auto overflow-hidden px-12">
         <div className="relative flex items-center">
           <motion.div
-            ref={(el) => registerCarouselRef && registerCarouselRef(id, el)} // <- fixed
+            ref={(el) => registerCarouselRef && registerCarouselRef(id, el)}
             className="flex transition-transform duration-500 ease-in-out"
             style={{
               width: `${(filteredMovies.length * 100) / visibleSlides}%`,
@@ -71,7 +71,7 @@ const Movies = ({ id, title = "Movies", movies = [], registerCarouselRef }) => {
             {filteredMovies.map((movie, index) => (
               <div
                 key={`${movie.id}-${index}`}
-                data-index={index} // used by parent for position tracking
+                data-index={index}
                 className="py-2 flex justify-center"
                 style={{ flex: `0 0 ${100 / visibleSlides}%` }}
               >

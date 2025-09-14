@@ -1,11 +1,10 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import logo from "../assets/logo.png"; // Make sure this path is correct
+import logo from "../assets/logo.png"; 
 
 export default function OnBoardingPage({ onFinish }) {
 
 useEffect(() => {
-    // Call onFinish after the longest animation finishes (5s)
     const timer = setTimeout(() => {
       if (onFinish) onFinish();
     }, 5000);

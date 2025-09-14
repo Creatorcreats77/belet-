@@ -1,5 +1,3 @@
-// src/context/KeyboardContext.jsx
-
 import React, {
   createContext,
   useContext,
@@ -9,8 +7,8 @@ import React, {
 } from "react";
 import { Form, useNavigate } from "react-router-dom";
 import { useUnit } from "effector-react";
-import { $movieOpen, setmovieOpen } from "../model/movie";
-import { $movieId, upMovie, downMovie, setmovieId } from "../model/movie";
+import { $movieOpen, setmovieOpen } from "../model/movieUpDown";
+import { $movieId, upMovie, downMovie, setmovieId } from "../model/movieUpDown";
 import {
   $current,
   $activeIndex,
@@ -18,12 +16,12 @@ import {
   setActiveIndex,
   nextSlide,
   prevSlide,
-} from "../model/sliderStore";
+} from "../model/sliderNextPrev";
 import {
   nextSlideSearch,
   prevSlideSearch,
   setMovieIdSearch,
-} from "../model/searchMoviesStore";
+} from "../model/searchMoviesStoreNextPrev";
 
 import {
   moveFilterUp,
@@ -35,10 +33,9 @@ import {
   resetFilter,
   setFilterSelection,
 } from "../model/filterSidebarStore";
-import { resetSearchMovies } from "../model/searchMoviesStore";
+import { resetSearchMovies } from "../model/searchMoviesStoreNextPrev";
 import { $categories } from "../model/categories";
-import { filterOptions, filters } from "../model/filterOptions";
-import { setCurrentIndex } from "../model/movieContainer";
+import { filterOptions, filters } from "../model/data/filterCategories";
 
 // TV remote / keyboard key codes
 const TvKeyCode = {
@@ -218,7 +215,7 @@ export const KeyboardProvider = ({ children }) => {
             console.log("Updated vertical Index:", newValue);
 
             if (newValue === 0) {
-              setIsOpen(true); // don't use !isOpen if you need reliable toggling
+              setIsOpen(true);
               setMoviePageSidebar(true);
               setSearchPageSidebar(false);
               setFocusedRegion("sidebar");
@@ -248,7 +245,7 @@ export const KeyboardProvider = ({ children }) => {
             setMoviePageSidebar(false);
             setFocusedRegion("searchMovies");
             setSearchPageSidebar(true);
-            setGoBack('home');
+            setGoBack("home");
             navigate(-1);
           }
         }
@@ -264,7 +261,7 @@ export const KeyboardProvider = ({ children }) => {
         } else if (TvKeyCode.ENTER.includes(e.keyCode)) {
           // navigate("/homeDetail");
         } else if (TvKeyCode.BACK.includes(e.keyCode)) {
-          console.log(",,,,,,,,,", goBack)
+          console.log(",,,,,,,,,", goBack);
           if (goBack === "home") {
             console.log("Go back home");
             setFocusedRegion("home");
@@ -321,7 +318,7 @@ export const KeyboardProvider = ({ children }) => {
           setActiveFilter(0);
           setFocusedRegion("searchCategory");
         } else if (TvKeyCode.ENTER.includes(e.keyCode)) {
-          console.log("clicked right sidebar")
+          console.log("clicked right sidebar");
           const { items, activeIndex } = $filterSidebar.getState();
           const item = items[activeIndex];
           resetSearchMovies();
@@ -330,7 +327,7 @@ export const KeyboardProvider = ({ children }) => {
 
           // resetFilter();
           setSearchCategoryPageSidebar(false);
-          setFocusedRegion("searchMovies"); // go to movies after selection
+          setFocusedRegion("searchMovies");
         } else if (TvKeyCode.BACK.includes(e.keyCode)) {
           setActiveFilter(0);
           setFocusedRegion("searchCategory");
@@ -349,13 +346,13 @@ export const KeyboardProvider = ({ children }) => {
           setSearchCategoryPageSidebar(false);
         } else if (TvKeyCode.LEFT.includes(e.keyCode)) {
           setSearchCategoryId((prev) => {
-            const newId = prev > 0 ? prev - 1 : -1; // allow -1
+            const newId = prev > 0 ? prev - 1 : -1;
             if (newId === -1) {
               setSearchCategoryPageSidebar(true);
               setFocusedRegion("sidebar");
               setIsOpen(!isOpen);
             }
-            searchCategoryIdRef.current = newId; // update ref immediately
+            searchCategoryIdRef.current = newId; 
             console.log("LEFT → newId:", newId, "filterName:", filters[newId]);
             return newId;
           });
@@ -364,14 +361,14 @@ export const KeyboardProvider = ({ children }) => {
         } else if (TvKeyCode.RIGHT.includes(e.keyCode)) {
           setSearchCategoryId((prev) => {
             const newId = prev < filters.length - 1 ? prev + 1 : prev;
-            searchCategoryIdRef.current = newId; // update ref immediately
+            searchCategoryIdRef.current = newId; 
             console.log("RIGHT → newId:", newId, "filterName:", filters[newId]);
             return newId;
           });
 
           console.log("RIGHT currentId (ref):", searchCategoryIdRef.current);
         } else if (TvKeyCode.ENTER.includes(e.keyCode)) {
-          const currentId = searchCategoryIdRef.current; // use ref, not state
+          const currentId = searchCategoryIdRef.current; 
           console.log("ENTER clicked → id:", currentId);
 
           const filterName = filters[currentId];
@@ -486,7 +483,7 @@ export const KeyboardProvider = ({ children }) => {
         movieFocusedIndex,
         setMovieFocusedIndex,
         setMenuLength,
-        horizontalIndexForMoviePage, // ✅ add this
+        horizontalIndexForMoviePage,
         verticalIndexMoviePage,
         navigateToMovieDetail,
         setNavigateToMovieDetail,

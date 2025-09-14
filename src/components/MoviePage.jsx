@@ -1,9 +1,8 @@
-import React from "react";
+
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useState, useContext } from "react";
-import { ChevronLeft } from "lucide-react"; // if you use lucide icons
-import SideBar from "./SideBar"; // your component
-import { useKeyboard } from "./KeyboardContext"; // wherever you defined it
+import { useState } from "react";
+import SideBar from "./SideBar"; 
+import { useKeyboard } from "./KeyboardContext"; 
 import Loading from "./Loading";
 import {
   ThumbsUp,
@@ -24,16 +23,12 @@ export default function MoviePage() {
     setMenuLength,
     horizontalIndexForMoviePage,
     verticalIndexMoviePage,
-  } = useKeyboard(); // if your provider exposes a handler
+  } = useKeyboard(); 
   const location = useLocation();
   const navigate = useNavigate();
-  const { id } = useParams();
-
-  const [selected, setSelected] = useState(false);
 
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
-  // Movie passed via navigate state
   const movie = location.state?.movie;
   if (!movie) {
     return <p className="text-white p-4">Movie not found!</p>;
@@ -44,7 +39,7 @@ export default function MoviePage() {
   const year = movie.release_date
     ? new Date(movie.release_date).getFullYear()
     : "N/A";
-  const genres = movie.genre_ids?.join(" • ") || "Drama"; // you can map IDs to names if you have genres list
+  const genres = movie.genre_ids?.join(" • ") || "Drama"; 
   const duration = "1h 32m";
 
   return (

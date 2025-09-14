@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useUnit } from "effector-react";
 import { $categories, setCategories } from "./model/categories";
-import { setTotalMovies } from "./model/movie";
-import { setTotalSlides } from "./model/sliderStore";
+import { setTotalMovies } from "./model/movieUpDown";
+import { setTotalSlides } from "./model/sliderNextPrev";
 
 // Components
 import OnBoardingPage from "./components/OnBoardingPage";

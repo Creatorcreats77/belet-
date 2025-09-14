@@ -1,15 +1,18 @@
 // File: src/components/BottomSwiper.jsx
-import { useRef, useEffect, useCallback } from 'react';
-import { useUnit } from 'effector-react';
-import Movies from './Movies';
-import { $selectedMovieContainer, setSelectedMovieContainer } from '../model/movie';
-import { $activeIndex, setActiveIndex } from '../model/sliderStore';
+import { useRef, useEffect, useCallback } from "react";
+import { useUnit } from "effector-react";
+import Movies from "./Movies";
+import { $selectedMovieContainer } from "../model/movieUpDown";
+import { $activeIndex, setActiveIndex } from "../model/sliderNextPrev";
 
 const BottomSwiper = ({ categories = [], isOpen = true, scrollIndex }) => {
   const containerRef = useRef(null);
   const selected = useUnit($selectedMovieContainer);
 
-  const [activeIndexMap, setSliderActiveIndex] = useUnit([$activeIndex, setActiveIndex]);
+  const [activeIndexMap, setSliderActiveIndex] = useUnit([
+    $activeIndex,
+    setActiveIndex,
+  ]);
   const carouselRefs = useRef({});
   const prevSelectedRef = useRef(selected); // <- keep track of previous selected row
 
@@ -28,7 +31,7 @@ const BottomSwiper = ({ categories = [], isOpen = true, scrollIndex }) => {
 
   const findClosestIndexByX = (carouselNode, targetX) => {
     if (!carouselNode) return 0;
-    const children = Array.from(carouselNode.querySelectorAll('[data-index]'));
+    const children = Array.from(carouselNode.querySelectorAll("[data-index]"));
     if (!children.length) return 0;
 
     let bestIdx = 0;
@@ -39,7 +42,7 @@ const BottomSwiper = ({ categories = [], isOpen = true, scrollIndex }) => {
       const dist = Math.abs(center - targetX);
       if (dist < bestDist) {
         bestDist = dist;
-        bestIdx = parseInt(child.getAttribute('data-index'), 10);
+        bestIdx = parseInt(child.getAttribute("data-index"), 10);
       }
     });
     return bestIdx;
@@ -62,7 +65,7 @@ const BottomSwiper = ({ categories = [], isOpen = true, scrollIndex }) => {
     scrollPos = Math.max(scrollPos, 0);
     scrollPos = Math.min(scrollPos, container.scrollHeight - containerHeight);
 
-    container.scrollTo({ top: scrollPos, behavior: 'smooth' });
+    container.scrollTo({ top: scrollPos, behavior: "smooth" });
   }, [selected]);
 
   // Vertical navigation: move to the movie visually under the current active card
@@ -104,16 +107,16 @@ const BottomSwiper = ({ categories = [], isOpen = true, scrollIndex }) => {
     <div
       ref={containerRef}
       className={`absolute w-full h-screen overflow-hidden transition-all duration-500 ease-in-out ${
-        isOpen ? 'top-0 bg-black' : 'top-[80%]'
+        isOpen ? "top-0 bg-black" : "top-[80%]"
       }`}
-      style={{ paddingBottom: '40px' }}
+      style={{ paddingBottom: "40px" }}
     >
       {categories.map((category, catIndex) => (
         <div
           key={category.id}
           data-index={catIndex}
           className="p-2 transition-all"
-          style={{ marginBottom: '16px' }}
+          style={{ marginBottom: "16px" }}
         >
           <Movies
             id={category.id}
