@@ -321,6 +321,7 @@ export const KeyboardProvider = ({ children }) => {
           setActiveFilter(0);
           setFocusedRegion("searchCategory");
         } else if (TvKeyCode.ENTER.includes(e.keyCode)) {
+          console.log("clicked right sidebar")
           const { items, activeIndex } = $filterSidebar.getState();
           const item = items[activeIndex];
           resetSearchMovies();

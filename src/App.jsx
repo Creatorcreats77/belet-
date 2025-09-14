@@ -14,7 +14,6 @@ import MoviePage from "./components/MoviePage";
 // Global Keyboard Context
 import { KeyboardProvider } from "./components/KeyboardContext";
 import Search from "./components/Search";
-import QRWithLogo from "./components/QRWithLogo";
 
 const API_KEY = "8ef128e645b6cc47fe1ff2b61dd975ef";
 

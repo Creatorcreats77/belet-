@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useKeyboard } from "../components/KeyboardContext";
 import SearchMovies from "./SearchMovies";
 import { Mic, ChevronLeft } from "lucide-react";
-import KeyboardInput2 from "./KeyboardInput2";
+import KeyboardInput from "./KeyboardInput";
 import SideBar from "./SideBar";
 import { setMoviesLength, resetSearchMovies } from "../model/searchMoviesStore";
 import { useUnit } from "effector-react";
@@ -103,6 +103,51 @@ export default function Search() {
     }
   };
 
+    useEffect(() => {
+    if (!filterSidebar.selected) return;
+
+    const fetchByFilter = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        let url_d = `${DISCOVER_URL}?api_key=${API_KEY}&language=en-US&page=1&include_adult=false`;
+        let url_s = `${SEARCH_URL}?api_key=${API_KEY}&language=en-US&page=1&include_adult=false`;
+        let url;
+        const { filter, item } = filterSidebar.selected;
+
+        if (filter === "Genres") {
+          url = `${url_d}&with_genres=${item.id}`;
+        } else if (filter === "Year") {
+          url = `${url_d}&primary_release_year=${item}`;
+        } else if (filter === "Categories") {
+          url = `${url_d}&query=${item}`;
+        } else if (filter === "Countries") {
+          url = `${url_d}&with_origin_country=${item.code}`;
+        } else if (filter === "Subtitles") {
+          url = `${url_d}&with_original_language=${item.code}`;
+        } else {
+          url = `${url_s}&query=${encodeURIComponent(item)}`;
+        }
+
+        const response = await fetch(url);
+        const data = await response.json();
+        setMovies(data.results || []);
+      } catch (err) {
+        setError("Failed to fetch movies for this filter.");
+      } finally {
+        setLoading(false);
+        resetFilter();
+        setActiveFilter(null);
+      }
+    };
+
+    fetchByFilter();
+  }, [filterSidebar.selected]);
+
+
+  
+
   /* -------------------- Initialize Latest Movies -------------------- */
   useEffect(() => {
     // Fetch only when no data available
@@ -166,7 +211,7 @@ export default function Search() {
 
         {/* Keyboard */}
         <div className="sm:px-12 px-12 lg:px-98">
-          <KeyboardInput2 onInputChange={(text) => setSearchText(text)} />
+          <KeyboardInput onInputChange={(text) => setSearchText(text)} />
         </div>
 
         {/* Filters */}
@@ -203,6 +248,38 @@ export default function Search() {
           )}
         </div>
       </div>
+
+      {/* Right Filter Sidebar */}
+      {activeFilter && (
+        <div className="absolute right-0 top-0 h-screen w-[24%] bg-gray-700 text-white p-4 overflow-hidden z-50">
+          <h3 className="text-4xl font-bold mb-4 p-4">{activeFilter}</h3>
+          <div className="flex flex-col gap-2">
+            {filterOptions[activeFilter]
+              ?.slice(
+                filterSidebar.scrollOffset,
+                filterSidebar.scrollOffset + filterSidebar.visibleCount
+              )
+              .map((item, index) => {
+                const globalIndex = filterSidebar.scrollOffset + index;
+                const isActive = globalIndex === filterSidebar.activeIndex;
+
+                return (
+                  <button
+                    key={item.id ?? item.name ?? index}
+                    className={`py-6 px-4 rounded-lg text-3xl text-left transition-colors duration-200 ${
+                      isActive ? "bg-gray-200 text-black" : "text-gray-200"
+                    }`}
+                    onClick={() => {
+                      setFilterSelection({ filter: activeFilter, item });
+                    }}
+                  >
+                    {item.name ?? item}
+                  </button>
+                );
+              })}
+          </div>
+        </div>
+      )}
 
       {/* Left Sidebar */}
       <div className="absolute h-screen text-white">
