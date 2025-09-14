@@ -124,7 +124,7 @@ export default function MoviePage() {
                         className={`w-18 h-18 ${
                           0 === horizontalIndexForMoviePage &&
                           1 === verticalIndexMoviePage
-                            ? "text-gray-500 text-2xl"
+                            ? "text-gray-800 bg-white rounded-2xl p-2 text-2xl"
                             : "text-white"
                         }`}
                       />{" "}
@@ -135,7 +135,7 @@ export default function MoviePage() {
                         className={`w-18 h-18 ${
                           0 === horizontalIndexForMoviePage &&
                           2 === verticalIndexMoviePage
-                            ? "text-gray-500 text-2xl"
+                            ? "text-gray-800 bg-white rounded-2xl p-2 text-2xl"
                             : "text-white"
                         }`}
                       />{" "}
@@ -146,7 +146,7 @@ export default function MoviePage() {
                         className={`w-18 h-18 ${
                           0 === horizontalIndexForMoviePage &&
                           3 === verticalIndexMoviePage
-                            ? "text-gray-500 text-2xl"
+                            ? "text-gray-800 bg-white rounded-2xl p-2 text-2xl"
                             : "text-white"
                         }`}
                       />{" "}

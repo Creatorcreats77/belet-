@@ -12,7 +12,7 @@ import {
 
 const visibleSlides = 5;
 
-const SearchMovies = ({ id, title = "Movies", movies = [] }) => {
+const SearchMovies = ({ id, title = "Movies", movies = [], paginate}) => {
   const { navigateToMovieDetail, setNavigateToMovieDetail } = useKeyboard();
 
   const [currentsearch, activeIndexSearch, movieIdSearch] = useUnit([
@@ -38,14 +38,25 @@ const SearchMovies = ({ id, title = "Movies", movies = [] }) => {
   }, [navigateToMovieDetail, setNavigateToMovieDetail]);
 
   useEffect(() => {
-    if (!filteredMovies[activeIndex]) return;
-    if (
-      movieIdSearch.index !== -1 &&
-      (movieIdSearch.id !== id || movieIdSearch.index !== activeIndex)
-    ) {
-      setMovieIdSearch({ id, index: activeIndex });
-    }
-  }, [activeIndex, filteredMovies, id, movieIdSearch]);
+  if (!filteredMovies[activeIndex]) return;
+
+  // keep effector store in sync
+  if (
+    movieIdSearch.index !== -1 &&
+    (movieIdSearch.id !== id || movieIdSearch.index !== activeIndex)
+  ) {
+    setMovieIdSearch({ id, index: activeIndex });
+  }
+
+  // 👇 check if we are close to the end
+  const threshold = 1; // start loading more when 3 away from last
+  if (activeIndex >= filteredMovies.length - threshold) {
+    // figure out next page number (assuming API returns 20 movies per page)
+    const nextPage = Math.floor(filteredMovies.length / 20) + 1;
+    paginate(nextPage);
+  }
+}, [activeIndex, filteredMovies, id, movieIdSearch, paginate]);
+
 
   if (filteredMovies.length === 0) {
     return (
@@ -58,7 +69,7 @@ const SearchMovies = ({ id, title = "Movies", movies = [] }) => {
 
 let slideWidth;
 if (filteredMovies.length < 2) {
-  slideWidth = 100;
+  slideWidth = 1000;
 } else if (filteredMovies.length < 3) {
   slideWidth = 46;
 } else if (filteredMovies.length < 4) {
@@ -69,7 +80,7 @@ if (filteredMovies.length < 2) {
   return (
     <div id={id} className="relative">
       <h2 className="text-3xl font-bold mb-3 text-white mt-2 ps-24">{title}</h2>
-
+      
       <div className="relative w-full mx-auto overflow-hidden px-12">
         <div className="relative flex items-center">
           <motion.div

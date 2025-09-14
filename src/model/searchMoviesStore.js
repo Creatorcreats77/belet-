@@ -11,6 +11,13 @@ export const $currentSearch = createStore({});
 export const $movieIdSearch = createStore({ id: null, index: -1 });
 export const $moviesLength = createStore({});
 
+export const setActiveIndexSearch = createEvent();
+
+$activeIndexSearch.on(setActiveIndexSearch, (state, { id, index }) => ({
+  ...state,
+  [id]: index,
+}));
+
 const visibleSlides = 5;
 
 /* ---------------- Store movie length by carousel id ---------------- */
