@@ -18,7 +18,7 @@ import Search from "./components/Search";
 const API_KEY = "8ef128e645b6cc47fe1ff2b61dd975ef";
 
 function App() {
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(true);
   const [showLoading, setShowLoading] = useState(false);
   const [mainMovie, setMainMovie] = useState(null);
   const categories = useUnit($categories);

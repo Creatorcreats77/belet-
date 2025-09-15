@@ -85,7 +85,7 @@ const Movies = ({ id, title = "Movies", movies = [], registerCarouselRef }) => {
                   }`}
                 >
                   <img
-                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                    src={`https://image.tmdb.org/t/p/w154${movie.poster_path}`}
                     alt={movie.title || "Movie poster"}
                     className="w-full h-[464px] object-cover"
                     loading="lazy"

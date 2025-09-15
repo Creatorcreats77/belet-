@@ -121,7 +121,7 @@ export default function Search() {
         } else if (filter === "Year") {
           url = `${url_d}&primary_release_year=${item}`;
         } else if (filter === "Categories") {
-          url = `${url_d}&query=${item}`;
+          url = `${url_d}&query=${encodeURIComponent(item)}`;
         } else if (filter === "Countries") {
           url = `${url_d}&with_origin_country=${item.code}`;
         } else if (filter === "Subtitles") {
@@ -147,21 +147,26 @@ export default function Search() {
 
   /* -------------------- Initialize Latest Movies -------------------- */
   useEffect(() => {
-    // Fetch only when no data available
-    if (latestMovies.length === 0) {
+    if(!filterSidebar.selected){
+      if (latestMovies.length === 0) {
       fetchLatestMovies(1);
     }
+    }
+    
   }, []);
 
   /* -------------------- Sync Movies with Latest Movies -------------------- */
   useEffect(() => {
+    if(!filterSidebar.selected){
     if (!searchText) {
       setMovies(latestMovies);
     }
+  }
   }, [latestMovies, searchText]);
 
   /* -------------------- Load More Movies -------------------- */
   useEffect(() => {
+    if(!filterSidebar.selected){
     if (!searchText) {
       const expectedMovies = pageNumber * 20;
 
@@ -171,6 +176,7 @@ export default function Search() {
     } else {
       fetchMovies(pageNumber);
     }
+  }
   }, [pageNumber, searchText]);
 
   /* -------------------- Reset Pagination on Search Change -------------------- */

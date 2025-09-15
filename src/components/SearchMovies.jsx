@@ -68,7 +68,7 @@ const SearchMovies = ({ id, title = "Movies", movies = [], paginate }) => {
 
   let slideWidth;
   if (filteredMovies.length < 2) {
-    slideWidth = 1000;
+    slideWidth = 100;
   } else if (filteredMovies.length < 3) {
     slideWidth = 46;
   } else if (filteredMovies.length < 4) {
@@ -112,7 +112,7 @@ const SearchMovies = ({ id, title = "Movies", movies = [], paginate }) => {
                     onClick={() => setMovieIdSearch({ id, index })}
                   >
                     <img
-                      src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                      src={`https://image.tmdb.org/t/p/w154${movie.poster_path}`}
                       alt={movie.title || "Movie poster"}
                       className="w-full h-[464px] object-cover"
                       loading="lazy"

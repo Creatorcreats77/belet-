@@ -51,7 +51,6 @@ export const $filterSidebar = createStore(initialState)
   })
   .on(resetFilter, () => initialState)
   .on(selectFilterItem, (state) => state) // can extend this later
-  // ✅ now actually handle selection
   .on(setFilterSelection, (state, payload) => ({
     ...state,
     selected: payload,
